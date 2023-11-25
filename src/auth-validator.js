@@ -1,10 +1,9 @@
 import router from "./router";
 import axios from "axios"; // Assuming you have a configured axios instance
 import Cookies from "js-cookie";
-import store from "./store";
+import store from "./interceptors/store";
 
 const token = Cookies.get("token");
-
 if (token) {
   try {
     const response = await axios.get(
@@ -15,16 +14,23 @@ if (token) {
     );
 
     if (response.status !== 200) {
+      alert("Your connection has changed!");
       Cookies.remove("token");
       setTimeout(() => {
         router.push("/login");
       }, 0);
+      this.$store.dispatch("logout");
+    } else {
+      console.log(response);
+      //   this.$store.dispatch("login");
     }
   } catch (error) {
+    alert("Your connection has changed!");
     Cookies.remove("token");
     setTimeout(() => {
       router.push("/login");
     }, 0);
+    // this.$store.dispatch("logout");
     if (axios.isAxiosError(error)) {
       console.error("Axios error:", error.message);
       if (error.response) {

@@ -42,6 +42,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import router from "../router";
 // import TheWelcome from "../components/TheWelcome.vue";
+import { useToast } from "vue-toastification";
+
 export default {
   data() {
     return {
@@ -69,6 +71,7 @@ export default {
     async login() {
       const data = new FormData();
       data.append("method", "userLogin");
+      const toast = useToast();
 
       // Iterate through the formData keys
       for (const key in this.$data.formData) {
@@ -93,6 +96,10 @@ export default {
           }
         );
         if (response.status === 200) {
+          this.$store.dispatch("login");
+          toast.success("Successfully logged in.", {
+            timeout: 2000,
+          });
           Cookies.set(`token`, response.data.data.token, {
             expires: 7,
           });
@@ -107,6 +114,9 @@ export default {
           router.push("/dashboard");
         }
       } catch (error) {
+        toast.error("Invalid login credentials.", {
+          timeout: 2000,
+        });
         const responseData = error.response.data;
         if (responseData.errors) {
           this.errors = responseData.errors;

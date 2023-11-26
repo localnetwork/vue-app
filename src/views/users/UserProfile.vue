@@ -24,7 +24,7 @@ export default {
       data.append("method", `getUserById`);
       data.append("userId", id);
       try {
-        const response = await axios.post(
+        const response = axios.post(
           `${import.meta.env.VITE_APP_URL}/handler/router.php`,
           data,
           {

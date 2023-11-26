@@ -89,7 +89,7 @@ export default {
     //   const rolesFD = new FormData();
     //   rolesFD.append("method", "getUserRoles");
     //   rolesFD.append("userId", 22);
-    //   const resRoles = await axios.post(
+    //   const resRoles = axios.post(
     //     `${import.meta.env.VITE_APP_URL}/handler/router.php`,
     //     rolesFD,
     //     {
@@ -123,7 +123,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(
+        const response = axios.post(
           `${import.meta.env.VITE_APP_URL}/handler/router.php`,
           data,
           {
@@ -145,7 +145,7 @@ export default {
             expires: 7,
           });
           const token = Cookies.get("token");
-          const res = await axios.get(
+          const res = axios.get(
             `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
             {
               headers: { Authorization: `Bearer ${token}` },

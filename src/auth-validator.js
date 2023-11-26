@@ -14,24 +14,45 @@ if (token) {
     );
 
     if (response.status !== 200) {
+      store.state.isAuthenticated = false;
       alert("Your connection has changed!");
       Cookies.remove("token");
       setTimeout(() => {
         router.push("/login");
       }, 0);
-      this.$store.dispatch("logout");
     } else {
       console.log(response);
-      //   this.$store.dispatch("login");
+      store.state.isAuthenticated = true;
+      if (store.state.isUserRoles == null) {
+        try {
+          const rolesFD = new FormData();
+          rolesFD.append("method", "getUserRoles");
+          rolesFD.append("userId", 22);
+          const resRoles = await axios.post(
+            `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+            rolesFD,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          store.state.isUserRoles = resRoles.data.data;
+        } catch (error) {
+          store.state.isUserRoles = null;
+        }
+      } else {
+        console.log("heheh");
+      }
     }
   } catch (error) {
-    alert("Your connection has changed!");
-    Cookies.remove("token");
-    setTimeout(() => {
-      router.push("/login");
-    }, 0);
-    // this.$store.dispatch("logout");
     if (axios.isAxiosError(error)) {
+      store.state.isAuthenticated = false;
+      alert("Your connection has changed!");
+      Cookies.remove("token");
+      setTimeout(() => {
+        router.push("/login");
+      }, 0);
       console.error("Axios error:", error.message);
       if (error.response) {
         console.error("Response data:", error.response.data);
@@ -43,6 +64,7 @@ if (token) {
     }
   }
 } else {
+  store.state.isAuthenticated = false;
   Cookies.remove("token");
   setTimeout(() => {
     router.push("/login");

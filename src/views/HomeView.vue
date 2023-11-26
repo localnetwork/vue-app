@@ -1,5 +1,6 @@
 <template>
   <form
+    v-if="isAuthenticated === false"
     id="login-form"
     @submit.prevent="login"
     class="max-w-md mx-auto p-8 bg-white shadow-md rounded"
@@ -31,20 +32,36 @@
       Login
     </button>
   </form>
-
-  <div v-if="responseMessage">
-    <p>{{ responseMessage }}</p>
-  </div>
+  <AccessDenied v-if="isAuthenticated" />
 </template>
 
 <script>
 import axios from "axios";
+import store from "../interceptors/store";
 import Cookies from "js-cookie";
 import router from "../router";
 // import TheWelcome from "../components/TheWelcome.vue";
 import { useToast } from "vue-toastification";
+import AccessDenied from "../components/AccessDenied.vue";
 
 export default {
+  components: {
+    AccessDenied,
+  },
+  computed: {
+    isUserRoles() {
+      return this.$store.state.isUserRoles;
+    },
+    isAuthenticated() {
+      return this.$store.state.isAuthenticated;
+    },
+    // isUserInfo() {
+    //   return this.$store.state.isUserInfo;
+    // },
+    user() {
+      return this.$store.state.isUserInfo;
+    },
+  },
   data() {
     return {
       formData: {
@@ -68,6 +85,26 @@ export default {
     };
   },
   methods: {
+    // async setRoles() {
+    //   const rolesFD = new FormData();
+    //   rolesFD.append("method", "getUserRoles");
+    //   rolesFD.append("userId", 22);
+    //   const resRoles = await axios.post(
+    //     `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+    //     rolesFD,
+    //     {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //       },
+    //     }
+    //   );
+    //   if (resRoles.status === 200) {
+    //     console.log("20000");
+    //     // this.$store.state.isUserRoles = resRoles.data.data;
+    //     this.$store.dispatch("currentUserRoles");
+    //     console.log(store.state);
+    //   }
+    // },
     async login() {
       const data = new FormData();
       data.append("method", "userLogin");
@@ -96,7 +133,11 @@ export default {
           }
         );
         if (response.status === 200) {
+          // if (this.store) {
+          //   this.$store.dispatch("login");
+          // }
           this.$store.dispatch("login");
+          // this.$store.dispatch("userInfo", response.data.data.user_info);
           toast.success("Successfully logged in.", {
             timeout: 2000,
           });
@@ -110,8 +151,10 @@ export default {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
+
           this.formClear();
           router.push("/dashboard");
+          // this.setRoles();
         }
       } catch (error) {
         toast.error("Invalid login credentials.", {
@@ -121,6 +164,7 @@ export default {
         if (responseData.errors) {
           this.errors = responseData.errors;
         }
+        // this.$store.dispatch("logout");
       }
     },
     formClear() {

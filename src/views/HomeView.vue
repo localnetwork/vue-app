@@ -123,7 +123,7 @@ export default {
       }
 
       try {
-        const response = axios.post(
+        const response = await axios.post(
           `${import.meta.env.VITE_APP_URL}/handler/router.php`,
           data,
           {
@@ -145,7 +145,7 @@ export default {
             expires: 7,
           });
           const token = Cookies.get("token");
-          const res = axios.get(
+          const res = await axios.get(
             `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
             {
               headers: { Authorization: `Bearer ${token}` },

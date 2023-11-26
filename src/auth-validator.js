@@ -6,7 +6,7 @@ import store from "./interceptors/store";
 const token = Cookies.get("token");
 if (token) {
   try {
-    const response = axios.get(
+    const response = await axios.get(
       `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -28,7 +28,7 @@ if (token) {
           const rolesFD = new FormData();
           rolesFD.append("method", "getUserRoles");
           rolesFD.append("userId", 22);
-          const resRoles = axios.post(
+          const resRoles = await axios.post(
             `${import.meta.env.VITE_APP_URL}/handler/router.php`,
             rolesFD,
             {

@@ -74,7 +74,7 @@ export default {
       const data = new FormData();
       data.append("method", "getAllUsers");
       try {
-        const response = axios.post(
+        const response = await axios.post(
           `${import.meta.env.VITE_APP_URL}/handler/router.php`,
           data,
           {

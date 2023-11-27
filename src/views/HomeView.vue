@@ -1,37 +1,65 @@
 <template>
-  <form
-    v-if="isAuthenticated === false"
-    id="login-form"
-    @submit.prevent="login"
-    class="max-w-md mx-auto p-8 bg-white shadow-md rounded"
+  <div
+    class="flex shadow-xl border-[1px] border-[#f3f3f3] rounded-[10px] overflow-hidden !px-[0]"
   >
-    <div v-for="(field, key) in formData" :key="key" class="mb-4">
-      <label
-        :for="field.id"
-        class="block text-gray-700 text-sm font-bold mb-2"
-        >{{ field.label }}</label
+    <div class="content-left max-w-[50%] bg-[#FAFBFC] w-full p-[50px]">
+      <div class="text-[#0A053D] text-[30px] mt-[5px] mb-[15px] font-bold">
+        AMS
+      </div>
+      <span class="mb-[30px] block text-[#B4B5BC] font-normal max-w-[370px]"
+        >A central hub for faculty members and students.</span
       >
-
-      <input
-        v-if="field.fieldType == 'input'"
-        :id="field.id"
-        v-model="field.value"
-        :type="field.type"
-        :class="{ 'border-red-500': errors[key] }"
-        class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-      />
-      <span v-if="errors[key]" class="text-red-500 text-xs">{{
-        errors[key]
-      }}</span>
+      <img class="w-full" src="/images/hero.svg" />
     </div>
-
-    <button
-      type="submit"
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+    <div
+      class="login-content bg-white max-w-[50%] w-full p-[50px] flex flex-col"
     >
-      Login
-    </button>
-  </form>
+      <h1 class="font-bold text-[#344055] text-[30px] mt-[5px] mb-[15px]">
+        Login to Accounts Management
+      </h1>
+      <form
+        v-if="isAuthenticated === false"
+        id="login-form"
+        @submit.prevent="login"
+        class=""
+      >
+        <div v-for="(field, key) in formData" :key="key" class="mb-4">
+          <label
+            :for="field.id"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >{{ field.label }}</label
+          >
+
+          <input
+            v-if="field.fieldType == 'input'"
+            :id="field.id"
+            v-model="field.value"
+            :type="field.type"
+            :class="{ '!border-red-500': errors[key] }"
+            class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
+          />
+          <span v-if="errors[key]" class="text-red-500 text-xs">{{
+            errors[key]
+          }}</span>
+        </div>
+
+        <button
+          type="submit"
+          class="border rounded-md shadow-sm font-bold py-2 px-4 focus:outline-none focus:ring focus:ring-opacity-50 border min-w-[250px] rounded-md shadow-sm font-bold py-2 focus:outline-none focus:ring focus:ring-opacity-50 w-full mt-[15px] max-w-[300px] text-center block justify-between items-center bg-[#00b14f] !rounded-[50px] font-semibold text-[20px] text-white !p-[12px] inline-block"
+        >
+          Login
+        </button>
+      </form>
+      <div class="mt-[15px] border-t-[1px] pt-[30px] border-color-[#ccc]">
+        <a
+          @click="openNotification"
+          href="#"
+          class="underline text-sm text-gray-600 hover:text-gray-900"
+          >Forgot your password?</a
+        >
+      </div>
+    </div>
+  </div>
   <AccessDenied v-if="isAuthenticated" />
 </template>
 
@@ -43,7 +71,6 @@ import router from "../router";
 // import TheWelcome from "../components/TheWelcome.vue";
 import { useToast } from "vue-toastification";
 import AccessDenied from "../components/AccessDenied.vue";
-
 export default {
   components: {
     AccessDenied,
@@ -55,11 +82,11 @@ export default {
     isAuthenticated() {
       return this.$store.state.isAuthenticated;
     },
-    // isUserInfo() {
-    //   return this.$store.state.isUserInfo;
-    // },
     user() {
       return this.$store.state.isUserInfo;
+    },
+    TokenAndValidate() {
+      return this.$store.state.TokenAndValidate;
     },
   },
   data() {
@@ -85,26 +112,29 @@ export default {
     };
   },
   methods: {
-    // async setRoles() {
-    //   const rolesFD = new FormData();
-    //   rolesFD.append("method", "getUserRoles");
-    //   rolesFD.append("userId", 22);
-    //   const resRoles = axios.post(
-    //     `${import.meta.env.VITE_APP_URL}/handler/router.php`,
-    //     rolesFD,
-    //     {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //     }
-    //   );
-    //   if (resRoles.status === 200) {
-    //     console.log("20000");
-    //     // this.$store.state.isUserRoles = resRoles.data.data;
-    //     this.$store.dispatch("currentUserRoles");
-    //     console.log(store.state);
-    //   }
-    // },
+    openNotification(position = null, color) {
+      alert("Please relax and try to remember your password :)");
+    },
+    async setRoles() {
+      const rolesFD = new FormData();
+      rolesFD.append("method", "getUserRoles");
+      rolesFD.append("userId", 22);
+      const resRoles = axios.post(
+        `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+        rolesFD,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (resRoles.status === 200) {
+        console.log("20000");
+        // this.$store.state.isUserRoles = resRoles.data.data;
+        this.$store.dispatch("currentUserRoles");
+        console.log(store.state.isUserRoles);
+      }
+    },
     async login() {
       const data = new FormData();
       data.append("method", "userLogin");
@@ -133,6 +163,11 @@ export default {
           }
         );
         if (response.status === 200) {
+          console.log("200");
+          this.$store.dispatch("setTokenAndValidate", response.data.data.token);
+          Cookies.set(`token`, response.data.data.token, {
+            expires: 7,
+          });
           // if (this.store) {
           //   this.$store.dispatch("login");
           // }
@@ -141,9 +176,7 @@ export default {
           toast.success("Successfully logged in.", {
             timeout: 2000,
           });
-          Cookies.set(`token`, response.data.data.token, {
-            expires: 7,
-          });
+
           const token = Cookies.get("token");
           const res = await axios.get(
             `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
@@ -153,8 +186,11 @@ export default {
           );
 
           this.formClear();
-          router.push("/dashboard");
-          // this.setRoles();
+          // next("/dashboard");
+          this.$router.go("/dashboard");
+          // this.$router.push("/dashboard");
+          // router.push("/dashboard");
+          this.setRoles();
         }
       } catch (error) {
         toast.error("Invalid login credentials.", {

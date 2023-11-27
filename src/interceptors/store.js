@@ -30,4 +30,8 @@ export default createStore({
       commit("setUserRoles", true);
     },
   },
+  getters: {
+    isAuthenticated: (state) => state.isAuthenticated,
+    userRoles: (state) => state.userRoles,
+  },
 });

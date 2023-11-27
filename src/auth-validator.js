@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import store from "./interceptors/store";
 
 const token = Cookies.get("token");
+console.log("token", token);
 if (token) {
   try {
     const response = await axios.get(
@@ -12,6 +13,7 @@ if (token) {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+    console.log(response);
 
     if (response.status !== 200) {
       store.state.isAuthenticated = false;
@@ -21,29 +23,50 @@ if (token) {
         router.push("/login");
       }, 0);
     } else {
-      console.log(response);
       store.state.isAuthenticated = true;
-      if (store.state.isUserRoles == null) {
-        try {
-          const rolesFD = new FormData();
-          rolesFD.append("method", "getUserRoles");
-          rolesFD.append("userId", 22);
-          const resRoles = await axios.post(
-            `${import.meta.env.VITE_APP_URL}/handler/router.php`,
-            rolesFD,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-          store.state.isUserRoles = resRoles.data.data;
-        } catch (error) {
-          store.state.isUserRoles = null;
-        }
-      } else {
-        console.log("heheh");
+
+      try {
+        const rolesFD = new FormData();
+        rolesFD.append("method", "getUserRoles");
+        rolesFD.append("userId", 22);
+        const resRoles = await axios.post(
+          `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+          rolesFD,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        store.state.isUserRoles = resRoles.data.data;
+      } catch (error) {
+        store.state.isUserRoles = null;
       }
+
+      console.log("catch roles", store.state.isUserRoles);
+      // store.state.isUserRoles = resRoles.data.data;
+      // if (store.state.isUserRoles == null) {
+      //   try {
+      //     console.log("catch roles");
+      //     const rolesFD = new FormData();
+      //     rolesFD.append("method", "getUserRoles");
+      //     rolesFD.append("userId", 22);
+      //     const resRoles = await axios.post(
+      //       `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+      //       rolesFD,
+      //       {
+      //         headers: {
+      //           "Content-Type": "multipart/form-data",
+      //         },
+      //       }
+      //     );
+      //     store.state.isUserRoles = resRoles.data.data;
+      //   } catch (error) {
+      //     store.state.isUserRoles = null;
+      //   }
+      // } else {
+      //   console.log("heheh");
+      // }
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

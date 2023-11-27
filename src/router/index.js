@@ -59,8 +59,8 @@ const router = createRouter({
       // meta: { isAuthenticated: true },
     },
     {
-      path: "/management/users",
-      name: "management-users",
+      path: "/manage/users",
+      name: "manage-users",
       meta: {
         seo: {
           title: "Users Management",
@@ -69,7 +69,7 @@ const router = createRouter({
       component: () => import("../views/UsersManagement.vue"),
     },
     {
-      path: "/management/users/:userId",
+      path: "/manage/users/:userId",
       name: "user-profile",
       meta: {
         seo: {

@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     viewProfile(id) {
-      router.push(`/management/users/${id}`);
+      router.push(`/manage/users/${id}`);
     },
     async getAllUsers() {
       const data = new FormData();

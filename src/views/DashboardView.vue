@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isUserRoles && isAuthenticated">
+  <div v-if="isUserRoles && isAuthenticated == true">
     <h1 class="">Howdy, Diome</h1>
     <p
       class="flex items-center text-sm mt-[15px] text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out"
@@ -27,9 +27,7 @@ export default {
       return this.$store.state.isAuthenticated;
     },
   },
-  created() {
-    console.log(this.$store.state.isUserRoles);
-  },
+  created() {},
   data() {
     return {};
   },

@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!isAuthenticated && !isUserRoles"
     class="flex shadow-xl border-[1px] border-[#f3f3f3] rounded-[10px] overflow-hidden !px-[0]"
   >
     <div class="content-left max-w-[50%] bg-[#FAFBFC] w-full p-[50px]">
@@ -113,12 +114,12 @@ export default {
   },
   methods: {
     openNotification(position = null, color) {
-      alert("Please relax and try to remember your password :)");
+      alert("Please relax and try to remember your password.");
     },
     async setRoles() {
       const rolesFD = new FormData();
-      rolesFD.append("method", "getUserRoles");
-      rolesFD.append("userId", 22);
+      rolesFD.append("method", "getUserRole");
+      rolesFD.append("userId", 1);
       const resRoles = axios.post(
         `${import.meta.env.VITE_APP_URL}/handler/router.php`,
         rolesFD,
@@ -172,6 +173,7 @@ export default {
           //   this.$store.dispatch("login");
           // }
           this.$store.dispatch("login");
+
           // this.$store.dispatch("userInfo", response.data.data.user_info);
           toast.success("Successfully logged in.", {
             timeout: 2000,
@@ -187,10 +189,18 @@ export default {
 
           this.formClear();
           // next("/dashboard");
-          this.$router.go("/dashboard");
+          // this.$router.go("/dashboard");
           // this.$router.push("/dashboard");
           // router.push("/dashboard");
           this.setRoles();
+
+          setTimeout(() => {
+            router.go("/dashboard");
+          }, 0);
+
+          setTimeout(function () {
+            store.state.isAuthenticated = true;
+          }, 100);
         }
       } catch (error) {
         toast.error("Invalid login credentials.", {

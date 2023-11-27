@@ -15,7 +15,7 @@
           @click="goBack"
           class="px-5 inline py-3 text-sm font-medium leading-5 shadow-2xl text-white transition-all duration-400 border border-transparent rounded-lg focus:outline-none bg-green-600 active:bg-red-600 hover:bg-red-700"
         >
-          Go back
+          Go back to dashboard
         </button>
       </div>
       <div class="w-full lg:flex lg:justify-end lg:w-1/2 mx-5 my-12">
@@ -35,12 +35,8 @@ import router from "../router";
 export default {
   methods: {
     goBack() {
-      router.push("/");
+      router.push("/dashboard");
     },
   },
 };
 </script>
-
-<style scoped>
-/* Add your custom styles here if needed */
-</style>

@@ -1,10 +1,9 @@
 import router from "./router";
-import axios from "axios"; // Assuming you have a configured axios instance
+import axios from "axios";
 import Cookies from "js-cookie";
 import store from "./interceptors/store";
 
 const token = Cookies.get("token");
-console.log("token", token);
 if (token) {
   try {
     const response = await axios.get(
@@ -13,8 +12,6 @@ if (token) {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    console.log(response);
-
     if (response.status !== 200) {
       store.state.isAuthenticated = false;
       alert("Your connection has changed!");
@@ -27,8 +24,8 @@ if (token) {
 
       try {
         const rolesFD = new FormData();
-        rolesFD.append("method", "getUserRoles");
-        rolesFD.append("userId", 22);
+        rolesFD.append("method", "getUserRole");
+        rolesFD.append("userId", response.data.user_id);
         const resRoles = await axios.post(
           `${import.meta.env.VITE_APP_URL}/handler/router.php`,
           rolesFD,
@@ -38,19 +35,20 @@ if (token) {
             },
           }
         );
-        store.state.isUserRoles = resRoles.data.data;
+
+        console.log(resRoles);
+        store.state.isUserRoles = resRoles.data.data.role;
       } catch (error) {
         store.state.isUserRoles = null;
       }
 
-      console.log("catch roles", store.state.isUserRoles);
+      // console.log("catch roles", store.state.isUserRoles);
       // store.state.isUserRoles = resRoles.data.data;
       // if (store.state.isUserRoles == null) {
       //   try {
-      //     console.log("catch roles");
       //     const rolesFD = new FormData();
-      //     rolesFD.append("method", "getUserRoles");
-      //     rolesFD.append("userId", 22);
+      //     rolesFD.append("method", "getUserRole");
+      //     rolesFD.append("userId", 1);
       //     const resRoles = await axios.post(
       //       `${import.meta.env.VITE_APP_URL}/handler/router.php`,
       //       rolesFD,
@@ -65,7 +63,7 @@ if (token) {
       //     store.state.isUserRoles = null;
       //   }
       // } else {
-      //   console.log("heheh");
+      //   // console.log("heheh");
       // }
     }
   } catch (error) {

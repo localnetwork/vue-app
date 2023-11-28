@@ -25,23 +25,32 @@
         class=""
       >
         <div v-for="(field, key) in formData" :key="key" class="mb-4">
-          <label
-            :for="field.id"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >{{ field.label }}</label
-          >
+          <div v-if="field.fieldType === 'input'">
+            <label
+              :for="field.id"
+              class="block text-gray-700 text-sm font-bold mb-2"
+              >{{ field.label }}</label
+            >
 
-          <input
-            v-if="field.fieldType == 'input'"
-            :id="field.id"
-            v-model="field.value"
-            :type="field.type"
-            :class="{ '!border-red-500': errors[key] }"
-            class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
-          />
-          <span v-if="errors[key]" class="text-red-500 text-xs">{{
-            errors[key]
-          }}</span>
+            <input
+              :id="field.id"
+              v-model="field.value"
+              :type="field.type"
+              :class="{ '!border-red-500': errors[key] }"
+              class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
+            />
+            <span v-if="errors[key]" class="text-red-500 text-xs">{{
+              errors[key]
+            }}</span>
+          </div>
+
+          <div v-if="field.fieldType === 'markup'">
+            <span
+              v-if="errors[key]"
+              class="text-[14px] text-red-200 py-[5px] px-[12px] inline-block bg-red-500"
+              >{{ errors[key] }}</span
+            >
+          </div>
         </div>
 
         <button
@@ -107,6 +116,13 @@ export default {
           type: "password",
           value: "",
         },
+        status: {
+          id: "status",
+          label: "Status",
+          fieldType: "markup",
+          type: "markup",
+          value: "",
+        },
       },
       errors: [],
       responseMessage: "",
@@ -130,7 +146,6 @@ export default {
         }
       );
       if (resRoles.status === 200) {
-        console.log("20000");
         // this.$store.state.isUserRoles = resRoles.data.data;
         this.$store.dispatch("currentUserRoles");
         console.log(store.state.isUserRoles);
@@ -188,10 +203,6 @@ export default {
           );
 
           this.formClear();
-          // next("/dashboard");
-          // this.$router.go("/dashboard");
-          // this.$router.push("/dashboard");
-          // router.push("/dashboard");
           this.setRoles();
 
           setTimeout(() => {
@@ -203,9 +214,17 @@ export default {
           }, 100);
         }
       } catch (error) {
-        toast.error("Invalid login credentials.", {
-          timeout: 2000,
-        });
+        console.log(error.response.data.errors);
+
+        if (error.response.data.errors.status) {
+          toast.error("Your account is blocked.", {
+            timeout: 2000,
+          });
+        } else {
+          toast.error("Invalid login credentials.", {
+            timeout: 2000,
+          });
+        }
         const responseData = error.response.data;
         if (responseData.errors) {
           this.errors = responseData.errors;

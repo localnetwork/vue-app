@@ -1,8 +1,11 @@
 <template>
-  <h1>Create an account</h1>
+  {{ isUserRoles }}
+  <h2 class="text-[20px] font-medium text-gray-900">Create an account</h2>
+  <p class="mt-1 text-sm text-gray-600 mb-6">
+    Create a user by filling out the form.
+  </p>
 
-  {{ profile.first_name }}
-  <form id="login-form" @submit.prevent="login" class="">
+  <form id="create-user" @submit.prevent="save" class="">
     <div v-for="(field, key) in formData" :key="key" class="mb-4">
       <div v-if="field.fieldType == 'input'">
         <label
@@ -27,6 +30,9 @@
           >{{ field.label }}</label
         >
         <textarea
+          :id="field.id"
+          v-model="field.value"
+          :type="field.type"
           :class="{ '!border-red-500': errors[key] }"
           class="min-h-[100px] flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
         >
@@ -44,14 +50,24 @@
             class="flex gap-x-[5px] items-center mb-[5px]"
             v-for="option in field.options"
           >
-            <input
-              :name="field.id"
-              :id="`${field.id}-${option.value}`"
-              v-model="field.value"
-              :type="field.type"
-              :class="{ '!border-red-500': errors[key] }"
-              class="inline-flex px-[10px] !rounded-full border border-gray-300 cursor-pointer"
-            />
+            <span class="relative">
+              <input
+                :name="field.id"
+                :id="`${field.id}-${option.value}`"
+                v-model="field.value"
+                :value="`${option.value}`"
+                :type="field.type"
+                :class="{
+                  '!border-red-500': errors[key],
+                }"
+                class="inline-flex px-[10px] !rounded-full border border-gray-300 cursor-pointer"
+              />
+              <span
+                v-if="errors[key]"
+                class="border-2 rounded-full top-[2px] left-[-4px] block absolute !border-red-400 h-[20px] w-[20px]"
+              >
+              </span>
+            </span>
             <label
               :for="`${field.id}-${option.value}`"
               class="block text-gray-700 text-sm font-bold cursor-pointer"
@@ -76,6 +92,7 @@
               :name="field.id"
               :id="`${field.id}-${option.value}`"
               v-model="field.value"
+              :value="`${option.value}`"
               :type="field.type"
               :class="{
                 '!border-red-500': errors[key],
@@ -90,7 +107,7 @@
           </div>
         </div>
       </div>
-      <span v-if="errors[key]" class="text-red-500 text-xs">{{
+      <span v-if="errors[key]" class="text-red-500 font-bold text-xs">{{
         errors[key]
       }}</span>
     </div>
@@ -106,7 +123,17 @@
 <script>
 import axios from "axios";
 import router from "../../router";
+import { useToast } from "vue-toastification";
+
 export default {
+  computed: {
+    isUserRoles() {
+      return this.$store.state.isUserRoles;
+    },
+    user() {
+      return this.$store.state.isUserInfo;
+    },
+  },
   data() {
     return {
       profile: [],
@@ -132,6 +159,13 @@ export default {
           type: "textarea",
           value: "",
         },
+        birthday: {
+          id: "birthday",
+          label: "Birthday",
+          fieldType: "input",
+          type: "date",
+          value: "",
+        },
         email: {
           id: "email",
           label: "Email",
@@ -153,28 +187,28 @@ export default {
           type: "password",
           value: "",
         },
-        status: {
-          id: "status",
+        user_status: {
+          id: "user_status",
           label: "Status",
           fieldType: "radio",
           type: "radio",
           value: "",
           options: {
             active: {
-              value: 1,
+              value: 2,
               label: "Active",
             },
             disabled: {
-              value: 0,
+              value: 1,
               label: "Disabled",
             },
           },
         },
-        roles: {
-          id: "roles",
-          label: "Roles",
-          fieldType: "checkboxes",
-          type: "checkbox",
+        role: {
+          id: "role",
+          label: "Role",
+          fieldType: "radio",
+          type: "radio",
           value: "",
           options: {
             administrator: {
@@ -221,6 +255,55 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+    async save() {
+      const data = new FormData();
+      data.append("method", "createUser");
+      const toast = useToast();
+      for (const key in this.$data.formData) {
+        if (
+          this.$data.formData.hasOwnProperty(key) &&
+          key !== "errors" &&
+          key !== "responseMessage"
+        ) {
+          // Append the field's id and value to the FormData
+          data.append(key, this.$data.formData[key].value);
+        }
+      }
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+          {
+            method: "POST",
+            body: data,
+          }
+        );
+
+        if (response.ok) {
+          toast.success("User has been successfully created.", {
+            timeout: 2000,
+          });
+          this.formClear();
+        } else {
+          const responseData = await response.json();
+          console.log(responseData);
+          if (responseData.errors) {
+            this.errors = responseData.errors;
+            // console.log(responseData.errors);
+          } else {
+            console.error("Server Error:", responseData.message);
+          }
+
+          toast.error("Please check the errors in the fields.", {
+            timeout: 2000,
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+      console.log(this.formData.roles.value);
     },
 
     formClear() {

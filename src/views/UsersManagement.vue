@@ -83,7 +83,7 @@ export default {
             },
           }
         );
-        console.log(response.data.data);
+        // console.log(response.data.data);
         this.users = response.data.data;
       } catch (error) {
         console.error("Catch error:", error);

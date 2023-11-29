@@ -26,11 +26,11 @@ export default {
     :class="
       isAuthenticated == true
         ? 'container py-[50px] mx-auto w-full flex flex-wrap w-full'
-        : 'container py-[50px] mx-auto w-full flex flex-wrap w-full min-h-screen items-center'
+        : 'px-[15px] container py-[50px] mx-auto w-full flex flex-wrap w-full min-h-screen items-center'
     "
   >
     <div
-      class="max-w-[25%] px-[15px] w-full flex justify-start flex-col"
+      class="md:max-w-[25%] px-[15px] w-full flex justify-start flex-col mb-[15px] md:mb-0"
       v-if="this.$store.state.isAuthenticated == true"
     >
       <Sidebar />
@@ -39,7 +39,7 @@ export default {
       :class="
         this.$store.state.isAuthenticated == false
           ? 'w-full '
-          : 'w-full px-[15px] max-w-[75%]'
+          : 'w-full px-[15px] md:max-w-[75%]'
       "
     >
       <div

@@ -1,9 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { seoGuardWithNext } from "@aminoeditor/vue-router-seo";
-// import HomeView from "../views/HomeView.vue";
-// import DashboardView from "../views/DashboardView.vue";
-// import store from "../interceptors/store";
-// import NotFound from "../views/NotFound.vue";
 import store from "../interceptors/store";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -95,33 +91,54 @@ const router = createRouter({
       },
       component: () => import("../views/users/UserProfile.vue"),
     },
+    {
+      path: "/profile",
+      name: "profile",
+      meta: {
+        // requiresAuth: true,
+        seo: {
+          title: "Profile",
+        },
+      },
+      component: () => import("../views/profile/Profile.vue"),
+    },
   ],
 });
 
-const validateToken = async (token, to, from, next) => {
-  try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    if (res.status === 200) {
-      console.log("2000");
-      next();
-    } else {
-      console.log("not 2000");
+const validateToken = async (to, from, next) => {
+  next();
+  const token = Cookies.get("token");
+  const res = await axios.get(
+    `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
     }
-  } catch (error) {
-    console.error(error);
+  );
+
+  if (res.data.user_info.user_status == 1) {
+    // check status of the current user.
+    store.state.isAuthenticated = false;
+    store.state.isUserInfo = null;
+    store.state.isUserId = null;
+    alert("Your connection has been changed.");
+    Cookies.remove("token");
+    router.go("/dashboard");
   }
 };
 
-// router.beforeEach((to, from, next) => {
-//   // if (to.meta.requiresAuth) {
-//   // } else {
-//   // }
-// });
+router.beforeEach((to, from, next) => {
+  if (to) {
+    // console.log(to);
+    validateToken(to, from, next);
+  }
+  if (to.meta.requiresAuth) {
+    // console.log("from", from);
+    // console.log("next", next);
+    // console.log("to", to);
+  } else {
+    // next();
+  }
+});
 // router.beforeEach((to, from, next) => {
 //   if (to.meta.requiresAuth) {
 //     const token = Cookies.get("token");

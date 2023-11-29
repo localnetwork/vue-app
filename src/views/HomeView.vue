@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="!isAuthenticated && !isUserRoles"
-    class="flex shadow-xl border-[1px] border-[#f3f3f3] rounded-[10px] overflow-hidden !px-[0]"
+    class="flex flex-wrap flex-col-reverse md:flex-row shadow-xl border-[1px] border-[#f3f3f3] rounded-[10px] overflow-hidden !px-[0]"
   >
-    <div class="content-left max-w-[50%] bg-[#FAFBFC] w-full p-[50px]">
+    <div class="content-left md:max-w-[50%] bg-[#FAFBFC] w-full p-[50px]">
       <div class="text-[#0A053D] text-[30px] mt-[5px] mb-[15px] font-bold">
         AMS
       </div>
@@ -13,7 +13,7 @@
       <img class="w-full" src="/images/hero.svg" />
     </div>
     <div
-      class="login-content bg-white max-w-[50%] w-full p-[50px] flex flex-col"
+      class="login-content bg-white md:max-w-[50%] w-full p-[50px] flex flex-col"
     >
       <h1 class="font-bold text-[#344055] text-[30px] mt-[5px] mb-[15px]">
         Login to Accounts Management
@@ -55,7 +55,7 @@
 
         <button
           type="submit"
-          class="border rounded-md shadow-sm font-bold py-2 px-4 focus:outline-none focus:ring focus:ring-opacity-50 border min-w-[250px] rounded-md shadow-sm font-bold py-2 focus:outline-none focus:ring focus:ring-opacity-50 w-full mt-[15px] max-w-[300px] text-center block justify-between items-center bg-[#00b14f] !rounded-[50px] font-semibold text-[20px] text-white !p-[12px] inline-block"
+          class="border rounded-md shadow-sm font-bold py-2 px-4 focus:outline-none focus:ring focus:ring-opacity-50 border max-w-[250px] rounded-md shadow-sm font-bold py-2 focus:outline-none focus:ring focus:ring-opacity-50 w-full mt-[15px] text-center block justify-between items-center bg-[#00b14f] !rounded-[50px] font-semibold text-[20px] text-white !p-[12px] inline-block"
         >
           Login
         </button>
@@ -97,6 +97,9 @@ export default {
     },
     TokenAndValidate() {
       return this.$store.state.TokenAndValidate;
+    },
+    isUserId() {
+      return this.$store.state.isUserId;
     },
   },
   data() {
@@ -146,9 +149,7 @@ export default {
         }
       );
       if (resRoles.status === 200) {
-        // this.$store.state.isUserRoles = resRoles.data.data;
         this.$store.dispatch("currentUserRoles");
-        console.log(store.state.isUserRoles);
       }
     },
     async login() {
@@ -180,16 +181,10 @@ export default {
         );
         if (response.status === 200) {
           console.log("200");
-          this.$store.dispatch("setTokenAndValidate", response.data.data.token);
           Cookies.set(`token`, response.data.data.token, {
             expires: 7,
           });
-          // if (this.store) {
-          //   this.$store.dispatch("login");
-          // }
           this.$store.dispatch("login");
-
-          // this.$store.dispatch("userInfo", response.data.data.user_info);
           toast.success("Successfully logged in.", {
             timeout: 2000,
           });
@@ -208,10 +203,6 @@ export default {
           setTimeout(() => {
             router.go("/dashboard");
           }, 0);
-
-          setTimeout(function () {
-            store.state.isAuthenticated = true;
-          }, 100);
         }
       } catch (error) {
         console.log(error.response.data.errors);

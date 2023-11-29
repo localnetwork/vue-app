@@ -19,18 +19,18 @@ export default {
       return this.$store.state.isUserRoles;
     },
     isUserProfile() {
-      return this.$store.state.isUserProfile;
+      return this.$store.state.iserUserinfo;
     },
     isAuthenticated() {
       return this.$store.state.isAuthenticated;
     },
   },
   methods: {
-    isAuthenticated() {
-      return this.$store.state.isAuthenticated;
-    },
+    getUserInfo() {},
   },
-  created() {},
+  created() {
+    console.log(store.state);
+  },
   props: {},
   data() {
     return {};

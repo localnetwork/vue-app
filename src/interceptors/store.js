@@ -1,10 +1,7 @@
 import { createStore } from "vuex";
 import axios from "axios";
 export default createStore({
-  state: {
-    authenticated: false,
-    userRoles: null,
-  },
+  state: {},
   mutations: {
     setAuthentication(state, isAuthenticated) {
       state.isAuthenticated = isAuthenticated;
@@ -15,10 +12,13 @@ export default createStore({
     setUserInfo(state, isUserInfo) {
       state.isUserInfo = isUserInfo;
     },
+    setUserId(state, isUserId) {
+      state.isUserId = isUserId;
+    },
   },
   actions: {
     userInfo() {
-      commit("setUserInfo", []);
+      commit("setUserInfo", true);
     },
     login({ commit }) {
       commit("setAuthentication", true);
@@ -29,9 +29,14 @@ export default createStore({
     currentUserRoles({ commit }) {
       commit("setUserRoles", true);
     },
+    userId() {
+      commit("setUserId", true);
+    },
   },
   getters: {
     isAuthenticated: (state) => state.isAuthenticated,
     userRoles: (state) => state.userRoles,
+    isUserId: (state) => state.isUserId,
+    isUserinfo: (state) => state.isUserInfo,
   },
 });

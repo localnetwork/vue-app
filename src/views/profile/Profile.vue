@@ -1,10 +1,7 @@
 <template>
-  <h2 class="text-[20px] font-medium text-gray-900">Create an account</h2>
-  <p class="mt-1 text-sm text-gray-600 mb-6">
-    Create a user by filling out the form.
-  </p>
-
-  <form id="create-user" @submit.prevent="save" class="">
+  <h1>Update your Account</h1>
+  {{ profile.first_name }}
+  <form id="create-user" @submit.prevent="update" class="">
     <div v-for="(field, key) in formData" :key="key" class="mb-4">
       <div v-if="field.fieldType == 'input'">
         <label
@@ -44,10 +41,7 @@
           class="block text-gray-700 text-sm font-bold mb-2"
           >{{ field.label }}</label
         >
-        <div
-          v-if="field.options"
-          class="flex flex-wrap items-center gap-x-[15px]"
-        >
+        <div v-if="field.options" class="flex items-center gap-x-[15px]">
           <div
             class="flex gap-x-[5px] items-center mb-[5px]"
             v-for="option in field.options"
@@ -116,18 +110,16 @@
 
     <button
       type="submit"
-      class="border rounded-md shadow-sm font-bold py-2 px-4 focus:outline-none focus:ring focus:ring-opacity-50 border max-w-[250px] rounded-md shadow-sm font-bold py-2 focus:outline-none focus:ring focus:ring-opacity-50 w-full mt-[15px] text-center block justify-between items-center bg-[#00b14f] !rounded-[50px] font-semibold text-[20px] text-white !p-[12px] inline-block"
+      class="border rounded-md shadow-sm font-bold py-2 px-4 focus:outline-none focus:ring focus:ring-opacity-50 border min-w-[250px] rounded-md shadow-sm font-bold py-2 focus:outline-none focus:ring focus:ring-opacity-50 w-full mt-[15px] max-w-[300px] text-center block justify-between items-center bg-[#00b14f] !rounded-[50px] font-semibold text-[20px] text-white !p-[12px] inline-block"
     >
-      Create
+      Update your account
     </button>
   </form>
 </template>
 <script>
 import axios from "axios";
 import router from "../../router";
-import { useToast } from "vue-toastification";
 import store from "../../interceptors/store";
-
 export default {
   computed: {
     isUserRoles() {
@@ -139,6 +131,7 @@ export default {
   },
   data() {
     return {
+      profileData: [],
       profile: [],
       formData: {
         first_name: {
@@ -146,7 +139,7 @@ export default {
           label: "First Name",
           type: "text",
           fieldType: "input",
-          value: "",
+          value: "Test",
         },
         last_name: {
           id: "last_name",
@@ -176,6 +169,13 @@ export default {
           type: "email",
           value: "",
         },
+        current_password: {
+          id: "current_password",
+          label: "Current Password",
+          fieldType: "input",
+          type: "password",
+          value: "",
+        },
         password: {
           id: "password",
           label: "Password",
@@ -190,44 +190,6 @@ export default {
           type: "password",
           value: "",
         },
-        user_status: {
-          id: "user_status",
-          label: "Status",
-          fieldType: "radio",
-          type: "radio",
-          value: "",
-          options: {
-            active: {
-              value: 2,
-              label: "Active",
-            },
-            disabled: {
-              value: 1,
-              label: "Disabled",
-            },
-          },
-        },
-        role: {
-          id: "role",
-          label: "Role",
-          fieldType: "radio",
-          type: "radio",
-          value: "",
-          options: {
-            administrator: {
-              value: 1,
-              label: "Administrator",
-            },
-            faculty: {
-              value: 2,
-              label: "Faculty",
-            },
-            student: {
-              value: 3,
-              label: "Student",
-            },
-          },
-        },
       },
       errors: [],
       responseMessage: "",
@@ -236,11 +198,32 @@ export default {
   created() {
     // this.profile;
     this.getUserProfileInfo();
+    this.getProfileData();
     // console.log(router.currentRoute._rawValue.params.userId);
   },
   methods: {
+    async getProfileData() {
+      console.log(store.state);
+      const data = new FormData();
+      data.append("method", `getUserProfileData`);
+      data.append("userId", 5);
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+          data,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        this.profileData = response.data.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async getUserProfileInfo() {
-      const id = router.currentRoute._rawValue.params.userId;
+      const id = 5;
       const data = new FormData();
       data.append("method", `getUserById`);
       data.append("userId", id);
@@ -259,69 +242,13 @@ export default {
         console.error(error);
       }
     },
-    async save() {
-      const data = new FormData();
-      data.append("method", "createUser");
-      data.append("roleId", store.state.isUserInfo.role);
-      const toast = useToast();
-      for (const key in this.$data.formData) {
-        if (
-          this.$data.formData.hasOwnProperty(key) &&
-          key !== "errors" &&
-          key !== "responseMessage"
-        ) {
-          // Append the field's id and value to the FormData
-          data.append(key, this.$data.formData[key].value);
-        }
-      }
-
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_APP_URL}/handler/router.php`,
-          {
-            method: "POST",
-            body: data,
-          }
-        );
-
-        if (response.ok) {
-          toast.success("User has been successfully created.", {
-            timeout: 2000,
-          });
-          this.formClear();
-        } else {
-          const responseData = await response.json();
-          console.log(responseData);
-          if (responseData.errors) {
-            this.errors = responseData.errors;
-            // console.log(responseData.errors);
-          } else {
-            console.error("Server Error:", responseData.message);
-          }
-          if (responseData.errors.not_allowed) {
-            toast.error("You're not allowed to do this function.", {
-              timeout: 2000,
-            });
-          } else {
-            toast.error("Please check the errors in the fields.", {
-              timeout: 2000,
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    },
 
     formClear() {
-      // Iterate through the keys of this.formData
       for (const key in this.formData) {
         if (this.formData.hasOwnProperty(key)) {
           this.formData[key].value = "";
         }
       }
-
-      // Clear any previous errors
       this.errors = {};
       this.responseMessage = "";
     },

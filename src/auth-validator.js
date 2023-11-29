@@ -42,17 +42,17 @@ if (token) {
             },
           }
         );
-        if (resRoles.data.data.user_status === 2) {
-          store.state.isUserRoles = resRoles.data.data.role;
-        } else {
-          store.state.isUserRoles = null;
-          store.state.isAuthenticated = false;
-          alert("Your connection has changed!");
-          Cookies.remove("token");
-          setTimeout(() => {
-            router.push("/login");
-          }, 0);
-        }
+        // if (resRoles.data.data.user_status === 2) {
+        //   store.state.isUserRoles = resRoles.data.data.role;
+        // } else {
+        //   store.state.isUserRoles = null;
+        //   store.state.isAuthenticated = false;
+        //   alert("Your connection has changed!");
+        //   Cookies.remove("token");
+        //   setTimeout(() => {
+        //     router.push("/login");
+        //   }, 0);
+        // }
       } catch (error) {
         store.state.isUserRoles = null;
         store.state.isAuthenticated = false;

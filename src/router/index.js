@@ -115,7 +115,7 @@ const validateToken = async (to, from, next) => {
     }
   );
 
-  if (res.data.user_info.user_status == 1) {
+  if (res.data.user_info.user_status && res.data.user_info.user_status == 1) {
     // check status of the current user.
     store.state.isAuthenticated = false;
     store.state.isUserInfo = null;

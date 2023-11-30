@@ -189,13 +189,13 @@ export default {
             timeout: 2000,
           });
 
-          const token = Cookies.get("token");
-          const res = await axios.get(
-            `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+          // const token = Cookies.get("token");
+          // const res = await axios.post(
+          //   `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
+          //   {
+          //     headers: { Authorization: `Bearer ${token}` },
+          //   }
+          // );
 
           this.formClear();
           this.setRoles();

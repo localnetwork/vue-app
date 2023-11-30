@@ -108,12 +108,12 @@ const router = createRouter({
 const validateToken = async (to, from, next) => {
   next();
   const token = Cookies.get("token");
-  const res = await axios.get(
-    `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  // const res = await axios.get(
+  //   `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
+  //   {
+  //     headers: { Authorization: `Bearer ${token}` },
+  //   }
+  // );
 
   // if (res.data.user_info.user_status && res.data.user_info.user_status == 1) {
   //   // check status of the current user.

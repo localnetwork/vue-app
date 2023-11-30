@@ -4,12 +4,16 @@ import Cookies from "js-cookie";
 import store from "./interceptors/store";
 
 const token = Cookies.get("token");
+
 if (token) {
+  console.log(token);
   try {
     const response = await axios.get(
       `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          authorize: `Bearer ${token}`,
+        },
       }
     );
     if (response.status !== 200) {

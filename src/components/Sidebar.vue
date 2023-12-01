@@ -10,6 +10,7 @@
           {{ item.name }}
         </router-link>
       </div> -->
+
     <div
       v-for="menuItem in filteredMenuItems"
       :key="menuItem.name"
@@ -17,7 +18,8 @@
     >
       <router-link
         :to="menuItem.link"
-        class="flex items-center gap-x-[15px] text-[#111827] text-[18px] font-semibold"
+        :class="currentPath == menuItem.link ? 'active' : 'not-active'"
+        class="flex text-[#111827] items-center gap-x-[15px] text-[18px] font-semibold"
       >
         {{ menuItem.name }}
       </router-link>
@@ -48,7 +50,7 @@ export default {
     },
     filteredMenuItems() {
       const userRoles = this.$store.state.isUserRoles || [];
-      console.log(userRoles);
+      this.currentPath = router.currentRoute._value.path;
 
       return this.menuItems.filter((item) => {
         return (
@@ -61,6 +63,7 @@ export default {
   data() {
     return {
       menuItems: [],
+      currentPath: "",
     };
   },
   watch: {},

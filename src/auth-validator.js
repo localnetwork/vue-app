@@ -29,6 +29,8 @@ if (token) {
       store.state.isAuthenticated = true;
       store.state.isUserId = response.data.user_info.id;
       store.state.isUserInfo = response.data.user_info;
+      store.state.isUserProfile = response.data.user_profile[0];
+
       try {
       } catch (error) {
         console.error("Errors:", error);

@@ -1,7 +1,10 @@
 <template>
-  <h1>Update your Account</h1>
+  <h1 class="text-[20px] font-medium text-gray-900">Update your Account</h1>
+  <p class="mt-1 text-sm text-gray-600 mb-6">
+    Update your profile by filling out the form.
+  </p>
   {{ profile.first_name }}
-  <form id="create-user" @submit.prevent="update" class="">
+  <form id="create-user" @submit.prevent="updateProfile" class="">
     <div v-for="(field, key) in formData" :key="key" class="mb-4">
       <div v-if="field.fieldType == 'input'">
         <label
@@ -11,10 +14,21 @@
         >
 
         <input
+          v-if="field.type !== 'date'"
           :id="field.id"
           v-model="field.value"
           :type="field.type"
           :class="{ '!border-red-500': errors[key] }"
+          class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
+        />
+
+        <input
+          v-if="field.type === 'date'"
+          :id="field.id"
+          v-model="field.value"
+          :type="field.type"
+          :class="{ '!border-red-500': errors[key] }"
+          :max="maxDate"
           class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
         />
       </div>
@@ -120,14 +134,20 @@
 import axios from "axios";
 import router from "../../router";
 import store from "../../interceptors/store";
+import { useToast } from "vue-toastification";
 export default {
   computed: {
-    isUserRoles() {
-      return this.$store.state.isUserRoles;
+    maxDate() {
+      // For example, setting the max date to today
+      const today = new Date().toISOString().split("T")[0];
+      return today;
     },
-    user() {
-      return this.$store.state.isUserInfo;
-    },
+    // isUserRoles() {
+    //   return this.$store.state.isUserRoles;
+    // },
+    // user() {
+    //   return this.$store.state.isUserInfo;
+    // },
   },
   data() {
     return {
@@ -139,35 +159,40 @@ export default {
           label: "First Name",
           type: "text",
           fieldType: "input",
-          value: "Test",
+          // value: "Test",
+          value: this.$store.state.isUserProfile.first_name,
         },
         last_name: {
           id: "last_name",
           label: "Last Name",
           fieldType: "input",
           type: "text",
-          value: "",
+          // value: "",
+          value: this.$store.state.isUserProfile.last_name,
         },
         address: {
           id: "address",
           label: "Address",
           fieldType: "textarea",
           type: "textarea",
-          value: "",
+          // value: "",
+          value: this.$store.state.isUserProfile.address,
         },
         birthday: {
           id: "birthday",
           label: "Birthday",
           fieldType: "input",
           type: "date",
-          value: "",
+          // value: "",
+          value: this.$store.state.isUserProfile.birthday,
         },
         email: {
           id: "email",
           label: "Email",
           fieldType: "input",
           type: "email",
-          value: "",
+          // value: "",
+          value: this.$store.state.isUserInfo.email,
         },
         current_password: {
           id: "current_password",
@@ -178,17 +203,15 @@ export default {
         },
         password: {
           id: "password",
-          label: "Password",
+          label: "New Password",
           fieldType: "input",
           type: "password",
-          value: "",
         },
         confirm_password: {
           id: "confirm_password",
           label: "Confirm Password",
           fieldType: "input",
           type: "password",
-          value: "",
         },
       },
       errors: [],
@@ -202,8 +225,73 @@ export default {
     // console.log(router.currentRoute._rawValue.params.userId);
   },
   methods: {
+    async updateProfile() {
+      const uid = store.state.isUserId;
+      const data = new FormData();
+      const profileInfo = {
+        first_name: store.state.isUserProfile.first_name,
+        last_name: store.state.isUserProfile.last_name,
+        address: store.state.isUserProfile.address,
+        birthday: store.state.isUserProfile.birthday,
+      };
+      const jsonData = JSON.stringify(profileInfo);
+
+      data.append("method", `updateUser`);
+      data.append("userId", uid);
+      data.append("userEmail", store.state.isUserInfo.email);
+      data.append("userInfo", store.state.isUserInfo);
+      data.append("profileInfo", jsonData);
+
+      console.log(jsonData);
+
+      const toast = useToast();
+      for (const key in this.$data.formData) {
+        if (
+          this.$data.formData.hasOwnProperty(key) &&
+          key !== "errors" &&
+          key !== "responseMessage"
+        ) {
+          // Append the field's id and value to the FormData
+          data.append(key, this.$data.formData[key].value);
+        }
+      }
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+          data,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log("resss", response.data);
+        // if (response.data.errors) {
+        //   this.errors = response.data.errors;
+        // }
+        if (response.status === 200) {
+          this.errors = {};
+          this.responseMessage = "";
+          toast.success("Account successfully updated.", {
+            timeout: 2000,
+          });
+          this.formClear();
+        }
+      } catch (error) {
+        console.error(error);
+        if (error.response.data.errors) {
+          this.errors = error.response.data.errors;
+          toast.error(
+            "Unable to update. Please check the errors in the fields.",
+            {
+              timeout: 2000,
+            }
+          );
+        }
+      }
+    },
     async getProfileData() {
-      console.log(store.state);
       const data = new FormData();
       data.append("method", `getUserProfileData`);
       data.append("userId", 5);
@@ -223,7 +311,7 @@ export default {
       }
     },
     async getUserProfileInfo() {
-      const id = 5;
+      const id = store.state.isUserId;
       const data = new FormData();
       data.append("method", `getUserById`);
       data.append("userId", id);
@@ -244,13 +332,9 @@ export default {
     },
 
     formClear() {
-      for (const key in this.formData) {
-        if (this.formData.hasOwnProperty(key)) {
-          this.formData[key].value = "";
-        }
-      }
-      this.errors = {};
-      this.responseMessage = "";
+      this.formData.current_password.value = "";
+      this.formData.password.value = "";
+      this.formData.confirm_password.value = "";
     },
   },
   props: {},

@@ -1,6 +1,9 @@
 <template>
   <div v-if="isUserRoles && isAuthenticated == true">
-    <h1 class="">Howdy, Diome</h1>
+    <h1 class="text-[20px] font-medium text-gray-900">
+      Howdy, {{ userProfile.first_name }} {{ userProfile.last_name }}
+    </h1>
+
     <p
       class="flex items-center text-sm mt-[15px] text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out"
     >
@@ -18,6 +21,7 @@
 </template>
 
 <script>
+import store from "../interceptors/store";
 export default {
   computed: {
     isUserRoles() {
@@ -27,10 +31,20 @@ export default {
       return this.$store.state.isAuthenticated;
     },
   },
-  created() {},
-  data() {
-    return {};
+  created() {
+    this.getUserData();
   },
-  methods: {},
+  data() {
+    return {
+      userInfo: [],
+      userProfile: [],
+    };
+  },
+  methods: {
+    getUserData() {
+      this.userInfo = store.state.isUserInfo;
+      this.userProfile = store.state.isUserProfile;
+    },
+  },
 };
 </script>

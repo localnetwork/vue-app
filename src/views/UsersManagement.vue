@@ -2,7 +2,7 @@
   Users Management
 
   <div>
-    <vs-table max-items="1" pagination stripe :data="users">
+    <vs-table max-items="15" pagination stripe :data="users">
       <template #header>
         <h3>Users</h3>
       </template>

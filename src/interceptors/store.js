@@ -12,6 +12,9 @@ export default createStore({
     setUserInfo(state, isUserInfo) {
       state.isUserInfo = isUserInfo;
     },
+    setUserProfile(state, isUserProfile) {
+      state.isUserProfile = isUserProfile;
+    },
     setUserId(state, isUserId) {
       state.isUserId = isUserId;
     },
@@ -38,5 +41,6 @@ export default createStore({
     userRoles: (state) => state.userRoles,
     isUserId: (state) => state.isUserId,
     isUserinfo: (state) => state.isUserInfo,
+    isUserProfile: (state) => state.isUserProfile,
   },
 });

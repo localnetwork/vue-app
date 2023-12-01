@@ -182,7 +182,7 @@ export default {
         if (response.status === 200) {
           console.log("200");
           Cookies.set(`token`, response.data.data.token, {
-            expires: 7,
+            expires: 10,
           });
           this.$store.dispatch("login");
           toast.success("Successfully logged in.", {
@@ -205,7 +205,7 @@ export default {
           }, 0);
         }
       } catch (error) {
-        console.log(error.response.data.errors);
+        console.error(error.response.data.errors);
 
         if (error.response.data.errors.status) {
           toast.error("Your account is blocked.", {

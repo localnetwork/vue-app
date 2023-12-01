@@ -1,6 +1,6 @@
 <template>
   <aside
-    v-if="isAuthenticated == true"
+    v-if="isAuthenticated == true && isUserRoles"
     class="p-4 sm:p-8 bg-white shadow sm:rounded-lg w-full sticky top-[15px]"
   >
     <!-- Sidebar content goes here -->

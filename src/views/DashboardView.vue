@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAuthenticated == true">
+  <div v-if="isUserRoles && isAuthenticated == true">
     <h1 class="text-[20px] font-medium text-gray-900">
       Howdy, {{ userProfile.first_name }} {{ userProfile.last_name }}
     </h1>

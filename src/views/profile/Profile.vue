@@ -242,8 +242,6 @@ export default {
       data.append("userInfo", store.state.isUserInfo);
       data.append("profileInfo", jsonData);
 
-      console.log(jsonData);
-
       const toast = useToast();
       for (const key in this.$data.formData) {
         if (

@@ -81,8 +81,19 @@ const router = createRouter({
       component: () => import("../views/users/Create.vue"),
     },
     {
-      path: "/user/:userId/edit",
+      path: "/user/:userId",
       name: "user-profile",
+      meta: {
+        // requiresAuth: true,
+        seo: {
+          title: "Profile",
+        },
+      },
+      component: () => import("../views/users/UserProfile.vue"),
+    },
+    {
+      path: "/user/:userId/edit",
+      name: "user-edit",
       meta: {
         // requiresAuth: true,
         seo: {
@@ -105,25 +116,26 @@ const router = createRouter({
   ],
 });
 
+function logOut() {
+  store.state.isAuthenticated = false;
+  store.state.isUserInfo = null;
+  store.state.isUserId = null;
+  alert("Your connection has been changed.");
+  Cookies.remove("token");
+  router.go("/login");
+}
 const validateToken = async (to, from, next) => {
   next();
   const token = Cookies.get("token");
-  // const res = await axios.get(
-  //   `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
-  //   {
-  //     headers: { Authorization: `Bearer ${token}` },
-  //   }
-  // );
-
-  // if (res.data.user_info.user_status && res.data.user_info.user_status == 1) {
-  //   // check status of the current user.
-  //   store.state.isAuthenticated = false;
-  //   store.state.isUserInfo = null;
-  //   store.state.isUserId = null;
-  //   alert("Your connection has been changed.");
-  //   Cookies.remove("token");
-  //   router.go("/dashboard");
-  // }
+  const res = await axios.get(
+    `${import.meta.env.VITE_APP_URL}/validators/validateToken.php`,
+    {
+      headers: { authorize: `Bearer ${token}` },
+    }
+  );
+  if (res.data.user_info.user_status && res.data.user_info.user_status == 1) {
+    logOut();
+  }
 };
 
 router.beforeEach((to, from, next) => {

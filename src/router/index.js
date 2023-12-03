@@ -63,6 +63,7 @@ const router = createRouter({
       name: "manage-users",
       meta: {
         // requiresAuth: true,
+        rolesAllowed: [1],
         seo: {
           title: "Users Management",
         },
@@ -70,10 +71,24 @@ const router = createRouter({
       component: () => import("../views/UsersManagement.vue"),
     },
     {
-      path: "/user/create",
-      name: "user-create",
+      path: "/manage/students",
+      name: "manage-students",
       meta: {
         // requiresAuth: true,
+        rolesAllowed: [1, 2],
+        seo: {
+          title: "Students",
+        },
+      },
+      component: () => import("../views/Students.vue"),
+    },
+    {
+      path: "/user/create",
+      name: "user-create",
+
+      meta: {
+        // requiresAuth: true,
+        rolesAllowed: [1],
         seo: {
           title: "Create an account",
         },
@@ -96,11 +111,12 @@ const router = createRouter({
       name: "user-edit",
       meta: {
         // requiresAuth: true,
+        rolesAllowed: [1, 2],
         seo: {
           title: "Profile",
         },
       },
-      component: () => import("../views/users/UserProfile.vue"),
+      component: () => import("../views/users/UserProfileEdit.vue"),
     },
     {
       path: "/profile",
@@ -115,6 +131,10 @@ const router = createRouter({
     },
   ],
 });
+
+function dashboardRedirect() {
+  router.go("/dashboard");
+}
 
 function logOut() {
   store.state.isAuthenticated = false;
@@ -136,12 +156,25 @@ const validateToken = async (to, from, next) => {
   if (res.data.user_info.user_status && res.data.user_info.user_status == 1) {
     logOut();
   }
+  // if (to.meta.rolesAllowed) {
+  if (
+    to.meta.rolesAllowed &&
+    !to.meta.rolesAllowed.includes(res.data.user_info.role)
+  ) {
+    console.log("not allowed!");
+    router.push("/dashboard");
+  } else {
+    console.log("allowed");
+  }
+  // }
 };
 
 router.beforeEach((to, from, next) => {
   if (to) {
     // console.log(to);
     validateToken(to, from, next);
+  }
+  if (to.meta.rolesAllowed) {
   }
   if (to.meta.requiresAuth) {
     // console.log("from", from);

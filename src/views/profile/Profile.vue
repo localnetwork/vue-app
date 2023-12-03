@@ -3,8 +3,13 @@
   <p class="mt-1 text-sm text-gray-600 mb-6">
     Update your profile by filling out the form.
   </p>
-  {{ profile.first_name }}
-  <form id="create-user" @submit.prevent="updateProfile" class="">
+  <!-- {{ profile.first_name }} -->
+  <form
+    id="update-profile"
+    v-if="isLoading == false"
+    @submit.prevent="updateProfile"
+    class=""
+  >
     <div v-for="(field, key) in formData" :key="key" class="mb-4">
       <div v-if="field.fieldType == 'input'">
         <label
@@ -129,6 +134,22 @@
       Update your account
     </button>
   </form>
+
+  <div class="skeleton animate-pulse" v-else>
+    <div class="text-fields" v-for="i in 7" :key="i">
+      <div class="mb-[30px]">
+        <div
+          class="mt-[20px] max-w-[130px] w-full h-[20px] bg-slate-200 rounded"
+        ></div>
+        <div class="mt-[20px] w-full h-[35px] bg-slate-200 rounded"></div>
+      </div>
+    </div>
+    <div class="animate-pulse">
+      <div
+        class="mt-[20px] w-full h-[50px] max-w-[300px] bg-slate-200 rounded"
+      ></div>
+    </div>
+  </div>
 </template>
 <script>
 import axios from "axios";
@@ -151,6 +172,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       profileData: [],
       profile: [],
       formData: {
@@ -272,7 +294,7 @@ export default {
           this.errors = {};
           this.responseMessage = "";
           toast.success("Account successfully updated.", {
-            timeout: 2000,
+            timeout: 1000,
           });
           this.formClear();
         }
@@ -323,6 +345,13 @@ export default {
             },
           }
         );
+
+        if (response.status == 200) {
+          setTimeout(() => {
+            // Once the data is loaded, set loading to false
+            this.isLoading = false;
+          }, 1000);
+        }
         this.profile = response.data.data;
       } catch (error) {
         console.error(error);

@@ -1,118 +1,83 @@
 <template>
-  <h1>User Profile</h1>
-
-  {{ profile.first_name }}
-  <form id="login-form" @submit.prevent="login" class="">
-    <div v-for="(field, key) in formData" :key="key" class="mb-4">
-      <label
-        :for="field.id"
-        class="block text-gray-700 text-sm font-bold mb-2"
-        >{{ field.label }}</label
-      >
-
-      <input
-        v-if="field.fieldType == 'input'"
-        :id="field.id"
-        v-model="field.value"
-        :type="field.type"
-        :class="{ '!border-red-500': errors[key] }"
-        class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
-      />
-      <span v-if="errors[key]" class="text-red-500 text-xs">{{
-        errors[key]
-      }}</span>
+  <div v-if="isUserRoles && isAuthenticated == true && isLoading == false">
+    <h1 class="text-[30px] mb-[15px] font-medium text-gray-900">
+      User Profile
+    </h1>
+    <div class="text-[17px] font-medium text-gray-900 mb-[10px]">
+      Role:
+      <span>{{ profile.role_name }}</span>
     </div>
+    <div class="text-[17px] font-medium text-gray-900 mb-[10px]">
+      First Name:
+      <span>{{ profile.first_name }}</span>
+    </div>
+    <div class="text-[17px] font-medium text-gray-900 mb-[10px]">
+      Last Name:
+      <span>{{ profile.last_name }}</span>
+    </div>
+    <div class="text-[17px] font-medium text-gray-900 mb-[10px]">
+      Address:
+      <span>{{ profile.address }}</span>
+    </div>
+    <div class="text-[17px] font-medium text-gray-900 mb-[10px]">
+      Email:
+      <span
+        ><a :href="`mailto:${profile.email}`">{{ profile.email }}</a></span
+      >
+    </div>
+    <div class="text-[17px] font-medium text-gray-900 mb-[10px]">
+      Birthday:
+      <span>{{ profile.birthday }}</span>
+    </div>
+  </div>
 
-    <button
-      type="submit"
-      class="border rounded-md shadow-sm font-bold py-2 px-4 focus:outline-none focus:ring focus:ring-opacity-50 border min-w-[250px] rounded-md shadow-sm font-bold py-2 focus:outline-none focus:ring focus:ring-opacity-50 w-full mt-[15px] max-w-[300px] text-center block justify-between items-center bg-[#00b14f] !rounded-[50px] font-semibold text-[20px] text-white !p-[12px] inline-block"
-    >
-      Update
-    </button>
-  </form>
+  <div class="skeleton animate-pulse" v-else>
+    <div class="max-w-[200px] w-full h-[30px] bg-slate-200 rounded"></div>
+    <div
+      class="mt-[20px] max-w-[150px] w-full h-[15px] bg-slate-200 rounded"
+    ></div>
+    <div
+      class="mt-[20px] max-w-[150px] w-full h-[15px] bg-slate-200 rounded"
+    ></div>
+    <div
+      class="mt-[20px] max-w-[150px] w-full h-[15px] bg-slate-200 rounded"
+    ></div>
+    <div
+      class="mt-[20px] max-w-[350px] w-full h-[15px] bg-slate-200 rounded"
+    ></div>
+    <div
+      class="mt-[20px] max-w-[130px] w-full h-[15px] bg-slate-200 rounded"
+    ></div>
+  </div>
 </template>
 <script>
 import axios from "axios";
 import router from "../../router";
 export default {
+  computed: {
+    isUserRoles() {
+      return this.$store.state.isUserRoles;
+    },
+    isAuthenticated() {
+      return this.$store.state.isAuthenticated;
+    },
+  },
   data() {
     return {
+      isLoading: true,
       profile: [],
-      formData: {
-        first_name: {
-          id: "first_name",
-          label: "First Name",
-          type: "text",
-          fieldType: "input",
-          // value: "Test",
-          value: this.$store.state.isUserProfile.first_name,
-        },
-        last_name: {
-          id: "last_name",
-          label: "Last Name",
-          fieldType: "input",
-          type: "text",
-          // value: "",
-          value: this.$store.state.isUserProfile.last_name,
-        },
-        address: {
-          id: "address",
-          label: "Address",
-          fieldType: "textarea",
-          type: "textarea",
-          // value: "",
-          value: this.$store.state.isUserProfile.address,
-        },
-        birthday: {
-          id: "birthday",
-          label: "Birthday",
-          fieldType: "input",
-          type: "date",
-          // value: "",
-          value: this.$store.state.isUserProfile.birthday,
-        },
-        email: {
-          id: "email",
-          label: "Email",
-          fieldType: "input",
-          type: "email",
-          // value: "",
-          value: this.$store.state.isUserInfo.email,
-        },
-        current_password: {
-          id: "current_password",
-          label: "Current Password",
-          fieldType: "input",
-          type: "password",
-          value: "",
-        },
-        password: {
-          id: "password",
-          label: "New Password",
-          fieldType: "input",
-          type: "password",
-        },
-        confirm_password: {
-          id: "confirm_password",
-          label: "Confirm Password",
-          fieldType: "input",
-          type: "password",
-        },
-      },
       errors: [],
       responseMessage: "",
     };
   },
   created() {
-    // this.profile;
     this.getUserProfileInfo();
-    // console.log(router.currentRoute._rawValue.params.userId);
   },
   methods: {
     async getUserProfileInfo() {
       const id = router.currentRoute._rawValue.params.userId;
       const data = new FormData();
-      data.append("method", `getUserById`);
+      data.append("method", `getUserProfile`);
       data.append("userId", id);
       try {
         const response = await axios.post(
@@ -125,6 +90,12 @@ export default {
           }
         );
         this.profile = response.data.data;
+        if (response.status === 200) {
+          setTimeout(() => {
+            // Once the data is loaded, set loading to false
+            this.isLoading = false;
+          }, 1000);
+        }
       } catch (error) {
         console.error(error);
       }

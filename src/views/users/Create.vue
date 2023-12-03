@@ -121,6 +121,35 @@
       Create
     </button>
   </form>
+
+  <!-- <div class="skeleton animate-pulse">
+    <div class="text-fields" v-for="i in 7" :key="i">
+      <div class="mb-[30px]">
+        <div
+          class="mt-[20px] max-w-[130px] w-full h-[20px] bg-slate-200 rounded"
+        ></div>
+        <div class="mt-[20px] w-full h-[35px] bg-slate-200 rounded"></div>
+      </div>
+    </div>
+    <div>
+      <div
+        class="mb-[20px] max-w-[130px] w-full h-[20px] bg-slate-200 rounded"
+      ></div>
+      <div class="flex gap-x-[15px]">
+        <div
+          class="inline-flex gap-x-[15px] w-full max-w-[200px]"
+          v-for="i in 2"
+        >
+          <div
+            class="w-full mb-[15px] max-w-[35px] h-[30px] bg-slate-200 rounded-full"
+          ></div>
+          <div
+            class="w-full mb-[15px] max-w-[150px] h-[30px] bg-slate-200 rounded"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </template>
 <script>
 import axios from "axios";
@@ -140,6 +169,7 @@ export default {
   data() {
     return {
       profile: [],
+      // isLoading: true,
       formData: {
         first_name: {
           id: "first_name",
@@ -254,7 +284,14 @@ export default {
             },
           }
         );
+        console.log(response);
         this.profile = response.data.data;
+
+        // if (response.status === 200) {
+        //   setTimeout(function () {
+        //     this.isLoading = false;
+        //   }, 1000);
+        // }
       } catch (error) {
         console.error(error);
       }

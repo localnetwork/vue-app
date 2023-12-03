@@ -172,7 +172,7 @@ export default {
     },
     async getAllUsers() {
       const data = new FormData();
-      data.append("method", "getAllUsers");
+      data.append("method", "getAllStudents");
       data.append("searchQuery", this.searchQuery);
 
       console.log("Search Query:", this.searchQuery);

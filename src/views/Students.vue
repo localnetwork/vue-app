@@ -1,18 +1,20 @@
 <template>
-  <h1 class="text-[20px] font-medium text-gray-900">Users Management</h1>
+  <h1 class="text-[20px] font-medium text-gray-900 mb-[15px]">
+    Students Management
+  </h1>
 
-  <div>
+  <div v-if="isLoading == false">
     <input
       v-model="searchQuery"
       id="search_query"
       type="text"
       placeholder="Search..."
       @input="search"
-      class="flex px-[10px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
+      class="flex px-[10px] mb-[15px] w-full rounded-md border border-gray-300 min-h-[40px] shadow-sm block w-fullfocus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 disabled:opacity-50 disabled:bg-gray-50 disabled:cursor-not-allowed rounded-md"
     />
     <vs-table max-items="15" pagination stripe :data="users">
       <template #header>
-        <h3>Users</h3>
+        <!-- <h3>Users</h3> -->
       </template>
       <template #thead>
         <vs-th> Email </vs-th>
@@ -70,6 +72,34 @@
       </template>
     </vs-table>
   </div>
+
+  <div class="skeleton animate-pulse" v-if="isLoading">
+    <div
+      class="mb-[30px] w-full h-[40px] bg-slate-200 rounded text-slate-400 px-[15px] flex items-center"
+    >
+      Loading search...
+    </div>
+    <div class="flex justify-space-around mb-[30px] gap-[50px]">
+      <div
+        class="w-full max-w-[33.33%] h-[35px] bg-slate-200 rounded"
+        v-for="i in 7"
+      ></div>
+    </div>
+    <div class="row" v-for="i in 7" :key="i">
+      <div class="mb-[30px] w-full h-[35px] bg-slate-200 rounded"></div>
+    </div>
+    <div class="flex justify-end gap-x-[15px]">
+      <div
+        class="mb-[30px] w-full max-w-[35px] h-[35px] bg-slate-200 rounded-full"
+      ></div>
+      <div
+        class="mb-[30px] w-full max-w-[35px] h-[35px] bg-slate-200 rounded"
+      ></div>
+      <div
+        class="mb-[30px] w-full max-w-[35px] h-[35px] bg-slate-200 rounded-full"
+      ></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -84,6 +114,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       searchQuery: "",
       users: [],
       profile: [],
@@ -92,7 +123,6 @@ export default {
   methods: {
     search() {
       console.log(this.searchQuery);
-
       this.getAllUsers();
     },
     viewProfile(id) {
@@ -188,6 +218,9 @@ export default {
         );
         // console.log(response.data.data);
         this.users = response.data.data;
+        if (response.status === 200) {
+          this.isLoading = false;
+        }
       } catch (error) {
         console.error(error);
       }

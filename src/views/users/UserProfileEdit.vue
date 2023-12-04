@@ -1,8 +1,7 @@
 <template>
   <h1 class="text-[20px] mb-[20px] font-medium text-gray-900">
-    Edit {{ profile.first_name }}
+    Edit {{ profile.first_name }} {{ profile.last_name }}
   </h1>
-
   <form
     id="login-form"
     @submit.prevent="update"
@@ -42,7 +41,53 @@
         </textarea>
       </div>
 
-      <div v-if="field.fieldType == 'radio'">
+      <div
+        v-if="field.fieldType == 'radio' && field.allowedRoles"
+        :class="field.allowedRoles.includes(user.role) ? 'block' : 'hidden'"
+      >
+        <label
+          :for="field.id"
+          class="block text-gray-700 text-sm font-bold mb-2"
+          >{{ field.label }}</label
+        >
+        <div
+          v-if="field.options"
+          class="flex flex-wrap items-center gap-x-[15px]"
+        >
+          <div
+            class="flex gap-x-[5px] items-center mb-[5px]"
+            v-for="option in field.options"
+          >
+            <span class="relative">
+              <input
+                :name="field.id"
+                :id="`${field.id}-${option.value}`"
+                v-model="field.value"
+                :value="`${option.value}`"
+                :type="field.type"
+                :class="{
+                  '!border-red-500': errors[key],
+                }"
+                class="inline-flex px-[10px] !rounded-full border border-gray-300 cursor-pointer"
+              />
+              <span
+                v-if="errors[key]"
+                class="border-2 rounded-full top-[2px] left-[-4px] block absolute !border-red-400 h-[20px] w-[20px]"
+              >
+              </span>
+            </span>
+            <label
+              :for="`${field.id}-${option.value}`"
+              class="block text-gray-700 text-sm font-bold cursor-pointer"
+              >{{ option.label }}</label
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        class=""
+        v-else-if="field.fieldType === 'radio' && !field.allowedRoles"
+      >
         <label
           :for="field.id"
           class="block text-gray-700 text-sm font-bold mb-2"
@@ -164,6 +209,14 @@ import router from "../../router";
 import store from "../../interceptors/store";
 import { useToast } from "vue-toastification";
 export default {
+  computed: {
+    isUserRoles() {
+      return this.$store.state.isUserRoles;
+    },
+    user() {
+      return this.$store.state.isUserInfo;
+    },
+  },
   data() {
     return {
       isLoading: true,
@@ -175,40 +228,30 @@ export default {
           label: "First Name",
           type: "text",
           fieldType: "input",
-          // value: "Test",
-          // value: this.$store.state.isUserProfile.first_name,
         },
         last_name: {
           id: "last_name",
           label: "Last Name",
           fieldType: "input",
           type: "text",
-          // value: "",
-          // value: this.$store.state.isUserProfile.last_name,
         },
         address: {
           id: "address",
           label: "Address",
           fieldType: "textarea",
           type: "textarea",
-          // value: "",
-          // value: this.$store.state.isUserProfile.address,
         },
         birthday: {
           id: "birthday",
           label: "Birthday",
           fieldType: "input",
           type: "date",
-          // value: "",
-          // value: this.$store.state.isUserProfile.birthday,
         },
         email: {
           id: "email",
           label: "Email",
           fieldType: "input",
           type: "email",
-          // value: "",
-          // value: this.$store.state.isUserInfo.email,
         },
         password: {
           id: "password",
@@ -221,6 +264,27 @@ export default {
           label: "Confirm Password",
           fieldType: "input",
           type: "password",
+        },
+        role: {
+          id: "role",
+          label: "Role",
+          fieldType: "radio",
+          type: "radio",
+          allowedRoles: [1],
+          options: {
+            administrator: {
+              value: 1,
+              label: "Administrator",
+            },
+            faculty: {
+              value: 2,
+              label: "Faculty",
+            },
+            student: {
+              value: 3,
+              label: "Student",
+            },
+          },
         },
         user_status: {
           id: "user_status",
@@ -246,14 +310,10 @@ export default {
     };
   },
   created() {
-    // this.profile;
     this.getUserProfileInfo();
-    // console.log(router.currentRoute._rawValue.params.userId);
   },
   methods: {
     async update() {
-      console.log("update");
-      console.log("profile", this.profile);
       const id = router.currentRoute._rawValue.params.userId;
       const data = new FormData();
 
@@ -292,6 +352,7 @@ export default {
           toast.success("Account successfully updated.", {
             timeout: 1000,
           });
+          this.getUserProfileInfo();
           this.formClear();
         }
       } catch (error) {

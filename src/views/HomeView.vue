@@ -60,14 +60,14 @@
           Login
         </button>
       </form>
-      <div class="mt-[15px] border-t-[1px] pt-[30px] border-color-[#ccc]">
+      <!-- <div class="mt-[15px] border-t-[1px] pt-[30px] border-color-[#ccc]">
         <a
           @click="openNotification"
           href="#"
           class="underline text-sm text-gray-600 hover:text-gray-900"
           >Forgot your password?</a
         >
-      </div>
+      </div> -->
     </div>
   </div>
   <AccessDenied v-if="isAuthenticated" />

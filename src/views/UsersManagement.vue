@@ -65,6 +65,9 @@
                 <vs-dropdown-item @click="deleteAccount(data[indextr].id)"
                   >Delete</vs-dropdown-item
                 >
+                <vs-dropdown-item @click="resetPassword(data[indextr].id)"
+                  >Reset Password</vs-dropdown-item
+                >
               </vs-dropdown-menu>
             </vs-dropdown>
           </vs-td>
@@ -131,6 +134,73 @@ export default {
     editProfile(id) {
       router.push(`/user/${id}/edit`);
     },
+
+    async resetPassword(id) {
+      const toast = useToast();
+      const profileFD = new FormData();
+      profileFD.append("method", `getUserById`);
+      profileFD.append("userId", id);
+
+      const profileResponse = await axios.post(
+        `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+        profileFD,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const result = window.confirm(
+        `Are you sure you want to reset the password for user ${profileResponse.data.data.first_name} ${profileResponse.data.data.last_name}?`
+      );
+
+      if (result) {
+        const data = new FormData();
+
+        data.append("method", `passwordReset`);
+        data.append("userId", id);
+        data.append("email", profileResponse.data.data.email);
+        data.append("userRole", profileResponse.role);
+        data.append("currentUID", store.state.isUserInfo.id);
+        data.append("currentUserRole", store.state.isUserInfo.role);
+        data.append("currentUserStatus", store.state.isUserInfo.user_status);
+
+        try {
+          const response = await axios.post(
+            `${import.meta.env.VITE_APP_URL}/handler/router.php`,
+            data,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log(response);
+          if (response.status === 200) {
+            this.getAllUsers();
+            toast.success(
+              `Password has been reset for user ${profileResponse.data.data.first_name} ${profileResponse.data.data.last_name}`,
+              {
+                timeout: 2000,
+              }
+            );
+          }
+        } catch (error) {
+          console.error(error);
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+            if (error.response.data.errors.general) {
+              for (const key in error.response.data.errors.general) {
+                toast.error(`${error.response.data.errors.general[key]}`, {
+                  timeout: 2000,
+                });
+              }
+            }
+          }
+        }
+      }
+    },
     async deleteAccount(id) {
       const toast = useToast();
       const profileFD = new FormData();
@@ -148,7 +218,7 @@ export default {
       );
 
       const result = window.confirm(
-        "Are you sure you want to delete this user?"
+        `Are you sure you want to delete user ${profileResponse.data.data.first_name} ${profileResponse.data.data.last_name}?`
       );
       if (result) {
         const data = new FormData();
